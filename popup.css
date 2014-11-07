@@ -1,0 +1,20 @@
+.bottom{
+    bottom: 5px;
+    position:fixed;
+}
+.right{
+    right: 5px;
+    position:fixed;
+}
+.top{
+    top: 5px;
+    position:fixed;
+}
+.left{
+    left: 5px;
+    position:fixed;
+}
+
+.center {
+    text-align: center;
+}
