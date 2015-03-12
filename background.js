@@ -25,10 +25,13 @@ _gaq.push(['_trackPageview']);
  */
 flipkartAffApp = {};
 // Default account.
-flipkartAffApp.flipkartAffAcc = "menishanta";
+flipkartAffApp.flipkartAffAcc = 'menishanta';
 // Identifying product urls.
 flipkartAffApp.productDescriptors = ['&pid=', '?pid=', '/p/'];
-
+// Initial Url.
+flipkartAffApp.url = {};
+// Url Base.
+flipkartAffApp.url.base = '';
 
 /**
  * Returns the current affiliate id setup in memory.
@@ -45,6 +48,13 @@ flipkartAffApp.getCurrentAffId = function (where) {
   return flipkartAffApp.flipkartAffAcc;
 };
 
+
+flipkartAffApp.getCurrentUserEmail = function () {
+  if(localStorage["flipkartUserEmail"] != null) {
+    return encodeURI(localStorage["flipkartUserEmail"]);
+  }
+  return '';
+}
 
 /**
  * Adds params to the url object
@@ -74,19 +84,14 @@ flipkartAffApp.constructNewUrl = function () {
   return url;
 };
 
-// Initial Url.
-flipkartAffApp.url = {};
-// Url Base.
-flipkartAffApp.url.base = '';
-
 
 /**
  * Reset to default url params
  */
 flipkartAffApp.resetDefaultURLParams = function(){
   flipkartAffApp.url.params = {};
-  flipkartAffApp.url.params.affid = flipkartAffApp.flipkartAffAcc;
-  flipkartAffApp.url.params.affExtParam1 = 'chrome_extension';
+  flipkartAffApp.url.params.affid = flipkartAffApp.getCurrentAffId();
+  flipkartAffApp.url.params.affExtParam1 = flipkartAffApp.getCurrentUserEmail();
   flipkartAffApp.url.params.affExtParam2 = 'flipkart_affiliate_override';
 };
 
@@ -160,4 +165,14 @@ chrome.webRequest.onBeforeRequest.addListener(
   {urls: ["*://www.flipkart.com/*"]},
   // In request blocking mode
   ["blocking"]
+);
+
+
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    if (request.email != null && request.email != ''){
+      localStorage["flipkartUserEmail"] = request.email;
+      sendResponse({msg: "Stored Email: " + localStorage["flipkartUserEmail"]});
+    }
+  }
 );
