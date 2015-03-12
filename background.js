@@ -39,7 +39,8 @@ flipkartAffApp.url.base = '';
  * @returns {*}
  */
 flipkartAffApp.getCurrentAffId = function (where) {
-  if(localStorage["defaultFlipkartAff"] != null) {
+  if(localStorage["defaultFlipkartAff"] != null &&
+     localStorage["defaultFlipkartAff"] != '') {
     return localStorage["defaultFlipkartAff"];
   }
   if(where == "front"){
