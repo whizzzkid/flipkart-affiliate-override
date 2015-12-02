@@ -171,36 +171,50 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
     flipkartAffApp.url.params.affid = flipkartAffApp.getCurrentAffId();
     sendResponse({reply: flipkartAffApp.getCurrentAffId('front')});
   }
+  if (request.query == 'appifyUrl') {
+    sendResponse({reply: flipkartAffApp.appifyUrl(sender.url)});
+  }
 });
+
+
+/**
+ * Appify Urls
+ */
+flipkartAffApp.appifyUrl = function(url) {
+  flipkartAffApp.parseUrl(url);
+  flipkartAffApp.url.base = flipkartAffApp.url.base.replace(/www\.flipkart\.com/g, "dl.flipkart.com/dl");
+  flipkartAffApp.url.params.affExtParam2 = 'appifyUrl';
+  return flipkartAffApp.constructNewUrl();
+};
 
 
 /**
  * Redirect manager.
  */
 chrome.webRequest.onBeforeRequest.addListener(
-    function(details) {
-      flipkartAffApp.resetDefaultURLParams();
-      var redirectUrl = details.url;
-      if (flipkartAffApp.requiresRedirect(redirectUrl)) {
-        flipkartAffApp.parseUrl(redirectUrl);
-        var redirectTo = flipkartAffApp.constructNewUrl();
-        _gaq.push(['_trackEvent', redirectTo, 'redirected']);
-        return {redirectUrl: redirectTo};
-      }
-    },
-    // Applies to following url patterns
-    {urls: ['*://www.flipkart.com/*']},
-    // In request blocking mode
-    ['blocking']
+  function(details) {
+    flipkartAffApp.resetDefaultURLParams();
+    var redirectUrl = details.url;
+    if (flipkartAffApp.requiresRedirect(redirectUrl)) {
+      flipkartAffApp.parseUrl(redirectUrl);
+      var redirectTo = flipkartAffApp.constructNewUrl();
+      _gaq.push(['_trackEvent', redirectTo, 'redirected']);
+      return {redirectUrl: redirectTo};
+    }
+  },
+  // Applies to following url patterns
+  {urls: ['*://www.flipkart.com/*']},
+  // In request blocking mode
+  ['blocking']
 );
 
 
 chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-      if (request.email != null && request.email != '') {
-        localStorage['flipkartUserEmail'] = request.email;
-        sendResponse({
-          msg: 'Stored Email: ' + localStorage['flipkartUserEmail']});
-      }
+  function(request, sender, sendResponse) {
+    if (request.email != null && request.email != '') {
+      localStorage['flipkartUserEmail'] = request.email;
+      sendResponse({
+        msg: 'Stored Email: ' + localStorage['flipkartUserEmail']});
     }
+  }
 );
